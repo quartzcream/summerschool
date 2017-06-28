@@ -2,26 +2,16 @@ program arrays
   implicit none
   integer :: nx, ny
   integer :: i, alloc_stat
-  ! TODO: define allocatable array A
-
+  real, allocatable :: arr(:,:)
   write (*,*) 'Give number of rows and columns for matrix A:'
   read (*,*) nx, ny
 
-  ! TODO allocate A now that we know nx and ny
-
-
-  ! TODO Use array syntax to initialize the array
-
-
-
-
-
-
-
-  !--------------------------------------------------
-  ! Print out the array
-  do i = 1, nx
-    write(*,'(*(F6.1))') A(i,:)
+  allocate(arr(0:nx+1, 0:ny+1), stat=alloc_stat)
+  if(alloc_stat /= 0) call abort()
+  arr(:, :) = -1
+  arr(1:nx, 1:ny) = 1
+  do i = 0, nx+1
+    write(*,'(*(F6.1))') arr(i,:)
   end do
 
 

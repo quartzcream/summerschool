@@ -26,6 +26,12 @@ program intrinsics
 
   !--------------------------------------------------
   ! TODO: use array intrinsics to probe elements of A
+  write(*,'(F6.1)') sum(A, 2)
+  write(*,*) maxloc(A)
+  write(*,*) -maxval(A, A<0)
+  write(*,'(F6.1)') min(-maxval(A, A<0), minval(A, A>=0))
+  write(*,*) minval(A) >= 0
+  write(*,*) count(A >= 0.5)
 
 
 

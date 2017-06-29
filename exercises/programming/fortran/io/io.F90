@@ -9,6 +9,7 @@ contains
     real, dimension(:,:), allocatable, intent(out) :: field
     character(len=*), intent(in) :: filename
 
+    integer :: nx, ny, alloc_stat
 
     ! TODO: implement function that will:
     ! open the file
@@ -16,23 +17,11 @@ contains
     ! allocate matrix called field
     ! read rest of the file into field
     ! close the file
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    open(10, file=filename, action='read')
+    read(10, '(X,2I4)') nx, ny
+    allocate(field(0:nx-1, 0:ny-1), stat=alloc_stat)
+    if (alloc_stat /= 0) call abort()
+    read(10, *) field(:, :)
   end subroutine read_field
 
   ! Output routine, saves the temperature distribution as a png image

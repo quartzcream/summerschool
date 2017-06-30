@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     double dt;                  //!< Time step
     int nsteps;                 //!< Number of time steps
 
-    int image_interval = 10;    //!< Image output interval
+    int image_interval = 500;    //!< Image output interval
 
     int iter;                   //!< Iteration counter
 
@@ -38,9 +38,10 @@ int main(int argc, char **argv)
     start_clock = clock();
 
     /* Time evolve */
+#pragma omp parallel
     for (iter = 1; iter < nsteps; iter++) {
         evolve(&current, &previous, a, dt);
-        if (iter % image_interval == 0) {
+        if ((iter+1) % image_interval == 0) {
             write_field(&current, iter);
         }
         /* Swap current field so that it will be used

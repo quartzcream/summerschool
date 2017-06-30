@@ -19,6 +19,7 @@ void evolve(field *curr, field *prev, double a, double dt)
     dx2 = prev->dx * prev->dx;
     dy2 = prev->dy * prev->dy;
     for (i = 1; i < curr->nx + 1; i++) {
+#pragma omp for private(j)
         for (j = 1; j < curr->ny + 1; j++) {
             curr->data[i][j] = prev->data[i][j] + a * dt *
                                ((prev->data[i + 1][j] -

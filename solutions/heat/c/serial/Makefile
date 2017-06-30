@@ -1,4 +1,4 @@
-COMP=cray
+COMP=gnu
 
 COMMONDIR=../../common
 
@@ -11,7 +11,7 @@ endif
 
 ifeq ($(COMP),gnu)
 CC=gcc
-CCFLAGS=-O3 -Wall -I$(COMMONDIR)
+CCFLAGS=-O3 -Wall -I$(COMMONDIR) -march=native -fopenmp
 LDFLAGS=
 LIBS=-lpng
 endif

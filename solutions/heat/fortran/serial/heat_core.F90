@@ -68,8 +68,7 @@ contains
     dims(1) = size(side_t, 1)
     dims(2) = size(side_t, 2)
     dims(3) = size(side_x, 3)
-    allocate(tmp_side_t(0:dims(1)-1, 0:dims(2)-1), stat=alloc_stat)
-    if (alloc_stat /= 0) call abort()
+    allocate(tmp_side_t(0:dims(1)-1, 0:dims(2)-1))
 
     do t=0,dims(3)-1
       ! major area

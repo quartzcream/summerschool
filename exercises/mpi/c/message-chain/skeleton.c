@@ -30,24 +30,35 @@ int main(int argc, char *argv[])
 
     /* TODO start */
     /* Send and receive messages as defined in exercise */
-    if (myid < ntasks - 1) {
+		int dest = myid + 1;
+		int source = myid - 1;
+		if(myid == ntasks - 1){
+			dest = MPI_PROC_NULL;
+		}
+		if(myid == 0){
+			source = MPI_PROC_NULL;
+		}
+		MPI_Sendrecv(message, size, MPI_INT, dest, myid + 1, receiveBuffer, size, MPI_INT, source, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
-        printf("Sender: %d. Sent elements: %d. Tag: %d. Receiver: %d\n",
-               myid, size, myid + 1, myid + 1);
-    }
+		t1 = MPI_Wtime();
+		if (myid < ntasks - 1) {
+			printf("Sender: %d. Sent elements: %d. Tag: %d. Receiver: %d\n",
+					myid, size, myid + 1, myid + 1);
+		}
 
-    if (myid > 0) {
+		if (myid > 0) {
+			int cnt;
+			MPI_Get_count(&status, MPI_INT, &cnt);
+			printf("Receiver: %d. first element %d, received %d numbers\n",
+					myid, receiveBuffer[0], cnt);
 
-        printf("Receiver: %d. first element %d.\n",
-               myid, receiveBuffer[0]);
-    }
+		}
 
-    /* TODO end */
+		/* TODO end */
 
-    /* Finalize measuring the time and print it out */
-    t1 = MPI_Wtime();
-    MPI_Barrier(MPI_COMM_WORLD);
-    fflush(stdout);
+		/* Finalize measuring the time and print it out */
+		MPI_Barrier(MPI_COMM_WORLD);
+		fflush(stdout);
 
     printf("Time elapsed in rank %2d: %6.3f\n", myid, t1 - t0);
 

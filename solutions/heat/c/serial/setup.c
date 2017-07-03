@@ -8,7 +8,7 @@
 #include "heat.h"
 #include "../../common/pngwriter.h"
 
-#define NSTEPS 1000  // Default number of iteration steps
+#define NSTEPS 512  // Default number of iteration steps
 
 /* Initialize the heat equation solver */
 void initialize(int argc, char* argv[], field *current,
@@ -23,8 +23,8 @@ void initialize(int argc, char* argv[], field *current,
      */
 
 
-    int rows = 500;             //!< Field dimensions with default values
-    int cols = 500;
+    int rows = 1024;             //!< Field dimensions with default values
+    int cols = 1024;
 
     char input_file[64];        //!< Name of the optional input file
 

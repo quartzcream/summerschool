@@ -30,8 +30,8 @@ program heat_solve
   call initialize(current, previous, nsteps)
 
   rec_lengths = reshape((/ &
-                            32,  32,  16, &
-                            64,  64,  64, &
+                            32,  32,   16, &
+                            64,  64,   64, &
                            256, 256,  128  &
                           /), shape(rec_lengths))
 

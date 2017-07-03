@@ -1,4 +1,4 @@
-COMP=cray
+COMP=gnu
 
 COMMONDIR=../../common
 
@@ -14,14 +14,14 @@ endif
 ifeq ($(COMP),gnu)
 FC=gfortran
 CC=gcc
-FCFLAGS=-O3 -Wall 
+FCFLAGS=-O3 -Wall -march=native
 CCFLAGS=-O3 -Wall -I$(COMMONDIR)
 LDFLAGS=
 LIBS=-lpng
 endif
 
 EXE=heat_serial
-OBJS=main.o heat_mod.o core.o setup.o utilities.o io.o pngwriter_mod.o
+OBJS=main.o heat_mod.o core.o setup.o utilities.o io.o pngwriter_mod.o heat_core.o
 OBJS_PNG=$(COMMONDIR)/pngwriter.o
 
 
@@ -33,7 +33,7 @@ utilities.o: utilities.F90 heat_mod.o
 io.o: io.F90 heat_mod.o pngwriter_mod.o 
 setup.o: setup.F90 heat_mod.o utilities.o io.o
 pngwriter_mod.o: pngwriter_mod.F90 heat_mod.o
-main.o: main.F90 heat_mod.o core.o io.o setup.o utilities.o
+main.o: main.F90 heat_mod.o core.o io.o setup.o utilities.o heat_core.o
 
 $(EXE): $(OBJS) $(OBJS_PNG)
 	$(FC) $(FCFLAGS) $(OBJS) $(OBJS_PNG) -o $@ $(LDFLAGS) $(LIBS)

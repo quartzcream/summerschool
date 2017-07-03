@@ -34,8 +34,8 @@ program heat_solve
   integer :: task_cnt, my_id
   integer :: cart_comm
   integer, dimension(2) :: dims
-  integer, dimension(2) :: periods = (\ 1, 1 \)
-  real(dp), pointer, dimension(0:, 0:) :: p_big_side_t
+  integer, dimension(2) :: periods = (/ 1, 1 /)
+  real(dp), allocatable, dimension(:, :) :: big_side_t
   real(dp), allocatable, dimension(:, :, :)    :: mpi_side_t     ! x, y
   integer :: i, j
   integer :: tarket_id
@@ -45,33 +45,35 @@ program heat_solve
 
   real :: start, stop ! Timers
 
-  call mpi_initialize(err_mpi)
-  call mpi_comm_size(task_cnt, err_mpi)
+  call mpi_init(err_mpi)
+  call mpi_comm_size(MPI_COMM_WORLD, task_cnt, err_mpi)
   do while ((len+1)**2 <= task_cnt)
     len = len + 1
   end do
   dims = len
   call mpi_cart_create(MPI_COMM_WORLD, 2, dims, periods, 1, cart_comm)
-  call mpi_comm_rank(my_id, err_mpi)
+  call mpi_comm_rank(MPI_COMM_WORLD, my_id, err_mpi)
 
   if (my_id >= len**2) then
-    call mpi_finalize(err_mpi)
-    return
+    call mpi_abort(MPI_COMM_WORLD, 0, err_mpi)
   end if
+  call mpi_comm_size(cart_comm, task_cnt, err_mpi)
+  call mpi_comm_rank(cart_comm, my_id, err_mpi)
   if (my_id == 0) then
     call initialize(current, previous, nsteps)
-    p_big_side_t => current%data(lbound(current%data, 1)+1:lbound(current%data, 1)+loc_len*len, &
+    allocate(big_side_t(0:loc_len*len-1, 0:loc_len*len-1))
+    big_side_t(0:, 0:) = current%data(lbound(current%data, 1)+1:lbound(current%data, 1)+loc_len*len, &
        lbound(current%data, 2)+1:lbound(current%data, 2)+loc_len*len)
     allocate(mpi_side_t(loc_len, loc_len, len**2))
     do i=0, len-1
       do j=0, len-1
-        mpi_cart_rank(cart_comm, (\ i, j \), tarket_id, err_mpi)
-        mpi_side_t(:, :, tarket_id) = p_big_side_t(i*loc_len:(i+1)*loc_len-1, j*loc_len:(j+1)*loc_len-1)
+        call mpi_cart_rank(cart_comm, (/ i, j /), tarket_id, err_mpi)
+        mpi_side_t(:, :, tarket_id) = big_side_t(i*loc_len:(i+1)*loc_len-1, j*loc_len:(j+1)*loc_len-1)
       end do
     end do
   end if
   allocate(side_t(0:loc_len-1, 0:loc_len-1))
-  mpi_scatter(mpi_side_t, len**2, mpi_double, side_t, loc_len**2, mpi_double, 0, cart_comm, err_mpi)
+  call mpi_scatter(mpi_side_t, len**2, mpi_double, side_t, loc_len**2, mpi_double, 0, cart_comm, err_mpi)
   
 
   rec_lengths = reshape((/ &

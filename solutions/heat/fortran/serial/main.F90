@@ -138,8 +138,8 @@ program heat_solve
   end if
 
   write(*,'(A,F7.3,A,I3)') 'Iteration took ', stop - start, ' seconds for rank ', my_id
+  write(*,'(A,G0,A,I3)') 'Reference value at 5,5: ', big_side_t(4, 4), ' seconds for rank ', my_id
   if (my_id == 0) then
-    write(*,'(A,G0,A,I3)') 'Reference value at 5,5: ', big_side_t(4, 4), ' seconds for rank ', my_id
     call finalize(current, previous)
   end if
 

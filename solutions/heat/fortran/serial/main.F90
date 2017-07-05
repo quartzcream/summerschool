@@ -1,3 +1,4 @@
+
 ! Heat equation solver in 2D.
 
 program heat_solve
@@ -46,16 +47,16 @@ program heat_solve
   real :: start, stop ! Timers
 
   rec_lengths = reshape((/ &
-                            32,   32,   16, &
-                            64,   64,   64, &
-                           256,  256,  128, &
-                          loc_len, loc_len, jump_steps  &
-                          /), shape(rec_lengths))
+    32,   32,   16, &
+    64,   64,   64, &
+    256,  256,  128, &
+    loc_len, loc_len, jump_steps  &
+    /), shape(rec_lengths))
 
   call mpi_init(err_mpi)
   call mpi_comm_size(MPI_COMM_WORLD, task_cnt, err_mpi)
   do while ((len+1)**2 <= task_cnt)
-    len = len + 1
+  len = len + 1
   end do
   dims = len
   call mpi_cart_create(MPI_COMM_WORLD, 2, dims, periods, 1, cart_comm, err_mpi)
@@ -72,15 +73,15 @@ program heat_solve
     write (*,*) 'initialize done'
     allocate(big_side_t(0:loc_len*len-1, 0:loc_len*len-1))
     big_side_t(0:, 0:) = current%data(lbound(current%data, 1)+1:lbound(current%data, 1)+loc_len*len, &
-       lbound(current%data, 2)+1:lbound(current%data, 2)+loc_len*len)
-  ! Draw the picture of the initial state
+      lbound(current%data, 2)+1:lbound(current%data, 2)+loc_len*len)
+    ! Draw the picture of the initial state
     call write_field(big_side_t, 0)
     allocate(mpi_side_t(0:loc_len-1, 0:loc_len-1, 0:len**2-1))
     do i=0, len-1
-      do j=0, len-1
-        call mpi_cart_rank(cart_comm, (/ i, j /), tarket_id, err_mpi)
-        mpi_side_t(:, :, tarket_id) = big_side_t(i*loc_len:(i+1)*loc_len-1, j*loc_len:(j+1)*loc_len-1)
-      end do
+    do j=0, len-1
+    call mpi_cart_rank(cart_comm, (/ i, j /), tarket_id, err_mpi)
+    mpi_side_t(:, :, tarket_id) = big_side_t(i*loc_len:(i+1)*loc_len-1, j*loc_len:(j+1)*loc_len-1)
+    end do
     end do
   end if
   write (*,*) 'start scatter'
@@ -88,35 +89,35 @@ program heat_solve
   call mpi_scatter(mpi_side_t, loc_len**2, mpi_double, side_t, loc_len**2, mpi_double, 0, cart_comm, err_mpi)
 
   write (*,*) 'scatter done'
-  
+
 
   allocate(side_x(2, loc_len, jump_steps))
   allocate(side_y(loc_len/rec_lengths(1,1)*(rec_lengths(1,1)+2), 2, jump_steps))
 
   allocate(tmp_side_x(2, loc_len, jump_steps))
 
-    ! The actual write routine takes only the actual data
-    ! (without ghost layers) so we need array for that
+  ! The actual write routine takes only the actual data
+  ! (without ghost layers) so we need array for that
   allocate(tmp_side_y(loc_len/rec_lengths(1,1)*(rec_lengths(1,1)+2), 2, jump_steps))
 
 
   ! Largest stable time step
   dt = current%dx**2 * current%dy**2 / &
-       & (2.0 * a * (current%dx**2 + current%dy**2))
+    & (2.0 * a * (current%dx**2 + current%dy**2))
 
   ! Main iteration loop, save a picture every
   ! image_interval steps
 
   call cpu_time(start)
   do iter = 0, nsteps/jump_steps
-     call split_block(side_t, &
-       side_x, side_y, a*dt/current%dx**2, rec_lengths)
-     !     call calc_block(current%data(:ubound(current%data, 1)-2, :ubound(current%data, 2)-2), side_x, side_y, 0*a*dt/current%dx**2)
-     !! call evolve(current, previous, a, dt)
-     !if (mod(iter, image_interval) == 0) then
-     !   call write_field(current, iter)
-     !end if
-     !! call swap_fields(current, previous)
+    call split_block(side_t, &
+      side_x, side_y, a*dt/current%dx**2, rec_lengths)
+    !     call calc_block(current%data(:ubound(current%data, 1)-2, :ubound(current%data, 2)-2), side_x, side_y, 0*a*dt/current%dx**2)
+    !! call evolve(current, previous, a, dt)
+    !if (mod(iter, image_interval) == 0) then
+    !   call write_field(current, iter)
+    !end if
+    !! call swap_fields(current, previous)
   end do
 
   call cpu_time(stop)
@@ -138,7 +139,7 @@ program heat_solve
 
   write(*,'(A,F7.3,A,I3)') 'Iteration took ', stop - start, ' seconds for rank ', my_id
   if (my_id == 0) then
-    write(*,'(A,G0)') 'Reference value at 5,5: ', big_side_t(4, 4)
+    write(*,'(A,G0,A,I3)') 'Reference value at 5,5: ', big_side_t(4, 4), ' seconds for rank ', my_id
     call finalize(current, previous)
   end if
 

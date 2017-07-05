@@ -12,24 +12,15 @@ contains
     use pngwriter
     implicit none
 
-    type(field), intent(in) :: curr
+    real(dp), dimension(:,:), intent(inout) :: curr
     integer, intent(in) :: iter
     character(len=85) :: filename
-
-    ! The actual write routine takes only the actual data
-    ! (without ghost layers) so we need array for that
-    integer :: full_nx, full_ny, stat
-    real(dp), dimension(:,:), allocatable, target :: full_data
-
-    full_nx = curr%nx
-    full_ny = curr%ny
-
-    allocate(full_data(full_nx, full_ny))
-    full_data(1:curr%nx, 1:curr%ny) = curr%data(1:curr%nx, 1:curr%ny)
+    integer  :: stat
+    curr = max(curr, 4.0)
+    curr = min(curr, 86.0)
 
     write(filename,'(A5,I4.4,A4,A)')  'heat_', iter, '.png'
-    stat = save_png(full_data, full_nx, full_ny, filename)
-    deallocate(full_data)
+    stat = save_png(curr, size(curr, 1), size(curr, 2), filename)
   end subroutine write_field
 
 

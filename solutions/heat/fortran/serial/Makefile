@@ -5,8 +5,8 @@ COMMONDIR=../../common
 ifeq ($(COMP),cray)
 FC=ftn
 CC=cc
-FCFLAGS=-O3 
-CCFLAGS=-O3 -I/appl/opt/libpng/include -I$(COMMONDIR)
+FCFLAGS=-O3 -g -R bcs
+CCFLAGS=-O3 -g -R bcs -I/appl/opt/libpng/include -I$(COMMONDIR)
 LDFLAGS=-L/appl/opt/libpng/lib
 LIBS=-lpng -lz
 endif
@@ -18,6 +18,15 @@ FCFLAGS=-O3 -Wall -march=native
 CCFLAGS=-O3 -Wall -I$(COMMONDIR)
 LDFLAGS=
 LIBS=-lpng
+endif
+
+ifeq ($(COMP),intel)
+FC=ftn
+CC=cc
+FCFLAGS=-O3 -fno-omit-frame-pointer -masm=intel -fverbose-asm -g -ggdb
+CCFLAGS=-O3 -fno-omit-frame-pointer -masm=intel -fverbose-asm -g -ggdb -I/appl/opt/libpng/include -I$(COMMONDIR)
+LDFLAGS=-L/appl/opt/libpng/lib -fno-omit-frame-pointer -masm=intel -fverbose-asm -g -ggdb
+LIBS=-lpng -lz
 endif
 
 EXE=heat_serial
@@ -46,4 +55,4 @@ $(EXE): $(OBJS) $(OBJS_PNG)
 
 .PHONY: clean
 clean:
-	-/bin/rm -f $(EXE) a.out *.o *.mod *.png *~
+	-/bin/rm -f $(EXE) a.out *.o *.mod *.png *~ ../../common/pngwriter.o
